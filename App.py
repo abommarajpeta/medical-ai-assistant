@@ -18,18 +18,22 @@ GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 client = Groq(api_key=GROQ_API_KEY)
 
 # Load NLP model
-nlp = spacy.load("en_core_web_sm")
+try:
+    nlp = spacy.load("en_core_web_sm")
+except:
+    nlp = None
 
 # PubMed email (required)
-Entrez.email = "your_email@example.com"
+Entrez.email = "abommara@stevens.edu"
 
 # ---------------- CORE FUNCTIONS ----------------
 
 def extract_drug_name(question):
-    doc = nlp(question)
-    for ent in doc.ents:
-        if ent.label_ in ["ORG", "PRODUCT"]:
-            return ent.text.lower()
+    if nlp:
+        doc = nlp(question)
+        for ent in doc.ents:
+            if ent.label_ in ["ORG", "PRODUCT"]:
+                return ent.text.lower()
     return question.split()[-1].lower()
 
 
