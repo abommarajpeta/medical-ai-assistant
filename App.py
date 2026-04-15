@@ -56,6 +56,7 @@ def fetch_pubmed_data(query):
 
 def compute_confidence(sources):
     score = 0
+
     for s in sources:
         if s == "FDA":
             score += 0.5
@@ -82,13 +83,17 @@ def ask_question(question):
     fda_data = fetch_fda_data(keyword)
     pubmed_data = fetch_pubmed_data(keyword)
 
+    # ✅ TOKEN LIMIT FIX (CRITICAL)
+    fda_data = fda_data[:1]
+    pubmed_data = pubmed_data[:1]
+
     context = ""
 
     if fda_data:
-        context += "FDA Data:\n" + "\n".join(fda_data) + "\n\n"
+        context += "FDA Data:\n" + fda_data[0][:1000] + "\n\n"
 
     if pubmed_data:
-        context += "PubMed Data:\n" + "\n".join(pubmed_data)
+        context += "PubMed Data:\n" + pubmed_data[0][:1000]
 
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
@@ -137,6 +142,7 @@ if st.button("Ask"):
 
         with col1:
             st.metric("Confidence Level", level)
+
         with col2:
             st.metric("Score", score)
 
